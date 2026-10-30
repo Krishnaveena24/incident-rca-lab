@@ -1,0 +1,70 @@
+
+################ TIME ################
+Fri Oct 30 11:55:57 UTC 2026
+
+################ 1. CONTAINERS (docker compose ps -a) ################
+NAME        IMAGE                  COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+rca-api     incident-rca-lab-api   "gunicorn --workers …"   api       16 minutes ago   Up 15 minutes             0.0.0.0:8080->5000/tcp, [::]:8080->5000/tcp
+rca-mysql   mysql:8.0              "docker-entrypoint.s…"   mysql     16 minutes ago   Up 16 minutes (healthy)   33060/tcp, 0.0.0.0:3307->3306/tcp, [::]:3307->3306/tcp
+
+################ 2. EXIT CODE / OOM / RESTARTS (api) ################
+status=running exit=0 oomkilled=false restarts=0 started=2026-10-30T11:40:41.641848893Z
+
+################ 3. RESOURCE USAGE (docker stats) ################
+CONTAINER ID   NAME        CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+dd24eea219e5   rca-api     0.01%     72.59MiB / 256MiB     28.36%    112kB / 157kB     70.5MB / 193kB    3
+4da09818e5d0   rca-mysql   0.42%     400.9MiB / 7.756GiB   5.05%     57.5kB / 84.9kB   65.7MB / 1.41GB   39
+
+################ 4. HEALTH ENDPOINT ################
+{"db":"up","status":"ok","version":"1.0.0"}
+
+HTTP 200 in 0.003712s
+
+################ 5. API PROCESSES (ps inside container) ################
+    PID    PPID   RSS     ELAPSED CMD
+      1       0 23488       15:17 /usr/local/bin/python3.12 /usr/local/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --timeout 90 --log-level info app:app
+      7       1 38492       15:17 /usr/local/bin/python3.12 /usr/local/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --timeout 90 --log-level info app:app
+      8       1 40052       15:17 /usr/local/bin/python3.12 /usr/local/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --timeout 90 --log-level info app:app
+      9       0  3544       00:00 ps -eo pid,ppid,rss,etime,cmd
+
+################ 6. LAST 15 ERROR/WARNING LOG LINES (logs/api/api.log) ################
+{"ts": "2026-10-30T11:26:06", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 8, "msg": "request completed", "method": "GET", "path": "/", "query": "", "status": 404, "duration_ms": 0.2, "slow": false, "client_ip": "172.18.0.1", "request_id": "37472ce4fc75f20f8d7aefcfc9b85170"}
+{"ts": "2026-10-30T11:26:06", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 8, "msg": "request completed", "method": "GET", "path": "/favicon.ico", "query": "", "status": 404, "duration_ms": 0.2, "slow": false, "client_ip": "172.18.0.1", "request_id": "11a71714b167d95cc31fd6f53d4e338b"}
+{"ts": "2026-10-30T11:32:18", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 8, "msg": "request completed", "method": "GET", "path": "/", "query": "", "status": 404, "duration_ms": 0.1, "slow": false, "client_ip": "172.18.0.1", "request_id": "610989db9b8d"}
+{"ts": "2026-10-30T11:32:18", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 7, "msg": "request completed", "method": "GET", "path": "/favicon.ico", "query": "", "status": 404, "duration_ms": 0.2, "slow": false, "client_ip": "172.18.0.1", "request_id": "dd5e48ab62cf"}
+{"ts": "2026-10-30T11:40:53", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 8, "msg": "request completed", "method": "GET", "path": "/", "query": "", "status": 404, "duration_ms": 0.2, "slow": false, "client_ip": "172.18.0.1", "request_id": "2896776ecc6995bba9cb465a02dae6b2"}
+{"ts": "2026-10-30T11:45:46", "level": "WARNING", "service": "order-api", "version": "1.0.0", "pid": 7, "msg": "request completed", "method": "POST", "path": "/orders", "query": "", "status": 400, "duration_ms": 0.2, "slow": false, "client_ip": "172.18.0.1", "request_id": "f8b826dbc4ce"}
+
+################ 7. GUNICORN / CONTAINER STDERR (last 20) ################
+
+################ 8. MYSQL PROCESSLIST ################
+id	user	command	time	state	query
+237	root	Query	0	executing	SELECT id, user, command, time, state, LEFT(info, 80) AS query FROM information_
+
+################ 9. OPEN INNODB TRANSACTIONS ################
+
+################ 10. LOCK WAITS (who blocks whom) ################
+
+################ 11. SLOW QUERY LOG (last 15 lines) ################
+# Query_time: 23.525029  Lock_time: 0.000007 Rows_sent: 0  Rows_examined: 500000
+use shopdb;
+SET timestamp=1793360400;
+INSERT INTO orders (customer_email, product_id, quantity, total_amount, status, created_at)
+WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 500000)
+SELECT CONCAT('user', n % 50000, '@example.com'),
+       (n % 10) + 1,
+       (n % 3) + 1,
+       ((n % 3) + 1) * 49.99,
+       ELT((n % 4) + 1, 'CREATED', 'PAID', 'SHIPPED', 'CANCELLED'),
+       NOW() - INTERVAL (n % 525600) MINUTE
+FROM seq;
+/usr/sbin/mysqld, Version: 8.0.46 (MySQL Community Server - GPL). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+
+################ 12. INDEXES ON orders ################
+Key_name Column_name
+PRIMARY id
+idx_orders_customer_created created_at
+idx_orders_customer_created customer_email
+idx_orders_product product_id
