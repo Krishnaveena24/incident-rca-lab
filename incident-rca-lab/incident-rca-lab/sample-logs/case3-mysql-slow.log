@@ -1,0 +1,21 @@
+# docker compose exec mysql tail -n 40 /var/lib/mysql/slow.log  - real capture
+# Time: 2026-10-30T09:51:42.096394Z
+# User@Host: appuser[appuser] @ rca-api.incident-rca-lab_default [172.18.0.3]  Id:    16
+# Query_time: 0.139226  Lock_time: 0.000002 Rows_sent: 11  Rows_examined: 500023
+SET timestamp=1793353901;
+SELECT o.id, o.customer_email, p.name AS product, o.quantity,
+                      o.total_amount, o.status, o.created_at
+               FROM orders o JOIN products p ON p.id = o.product_id
+               WHERE o.customer_email = 'user42@example.com'
+               ORDER BY o.created_at DESC
+               LIMIT 50;
+# Time: 2026-10-30T09:51:42.231339Z
+# User@Host: appuser[appuser] @ rca-api.incident-rca-lab_default [172.18.0.3]  Id:    17
+# Query_time: 0.127794  Lock_time: 0.000004 Rows_sent: 11  Rows_examined: 500023
+SET timestamp=1793353902;
+SELECT o.id, o.customer_email, p.name AS product, o.quantity,
+                      o.total_amount, o.status, o.created_at
+               FROM orders o JOIN products p ON p.id = o.product_id
+               WHERE o.customer_email = 'user42@example.com'
+               ORDER BY o.created_at DESC
+               LIMIT 50;

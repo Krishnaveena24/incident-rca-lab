@@ -1,0 +1,21 @@
+# Real capture: mysql> SELECT ... FROM sys.innodb_lock_waits\G   (while the API request was hanging)
+*************************** 1. row ***************************
+                 waiting_pid: 102
+               waiting_query: SELECT id, name, price, stock  ... oducts WHERE id = 1 FOR UPDATE
+                blocking_pid: 101
+              blocking_query: DO SLEEP(60)
+                    wait_age: 00:00:03
+sql_kill_blocking_connection: KILL 101
+
+# mysql> SELECT trx_mysql_thread_id, trx_state, trx_started, age_s, trx_rows_locked FROM information_schema.innodb_trx;
+trx_mysql_thread_id  trx_state   trx_started          age_s  trx_rows_locked
+102                  LOCK WAIT   2026-10-30 09:52:02  3      1
+101                  RUNNING     2026-10-30 09:52:01  4      1
+
+# Client side
+$ curl -X POST http://localhost:8080/orders -d '{"customer_email":"a@b.com","product_id":1,"quantity":1}' ...
+{"error":"database_error","mysql_errno":1205,"request_id":"2ccc44c53a97"}
+HTTP 500 in 15.009505s
+
+# After KILL 101
+{"order_id":524282,"status":"CREATED","total_amount":899.99}   HTTP 201 in 0.009894s

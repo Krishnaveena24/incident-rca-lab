@@ -1,0 +1,51 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rca-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: shopdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    command:
+      - --slow_query_log=1
+      - --slow_query_log_file=/var/lib/mysql/slow.log
+      - --long_query_time=0.1          # log any query slower than 100 ms
+      - --innodb_lock_wait_timeout=15  # give up waiting for a row lock after 15 s
+      - --max_connections=100
+    ports:
+      - "3307:3306"                    # host port 3307 avoids clashing with a local MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+
+  api:
+    build: ./api
+    container_name: rca-api
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: appuser
+      DB_PASSWORD: apppass
+      DB_NAME: shopdb
+      SLOW_REQUEST_MS: 200
+      APP_VERSION: ${APP_VERSION:-1.0.0}
+      BUG_MODE: ${BUG_MODE:-false}                    # Case 1 toggles this
+      EXPORT_PAGINATION: ${EXPORT_PAGINATION:-false}  # Case 4 fix toggles this
+    ports:
+      - "8080:5000"                    # API at http://localhost:8080
+    volumes:
+      - ./logs/api:/app/logs           # api.log appears in your VS Code explorer
+    mem_limit: 256m                    # small on purpose (Case 4: OOM)
+    depends_on:
+      mysql:
+        condition: service_healthy
+    # restart: unless-stopped          # Preventive action you will enable after Case 2/4
+
+volumes:
+  mysql_data:

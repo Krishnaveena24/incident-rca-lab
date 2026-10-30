@@ -1,0 +1,13 @@
+# Real capture: EXPLAIN for /orders/search query
+
+## BEFORE (index missing) -> full table scan
+table: o   type: ALL   possible_keys: idx_orders_product   key: NULL
+rows: 496808   Extra: Using where; Using filesort
+
+## AFTER (CREATE INDEX idx_orders_customer_created ON orders (customer_email, created_at))
+table: o   type: ref   key: idx_orders_customer_created   rows: 11
+Extra: Backward index scan
+
+## Load test (40 requests, 10 parallel)
+BEFORE: min=0.313s  p50=1.312s  max=1.420s
+AFTER : min=0.021s  p50=0.054s  max=0.074s

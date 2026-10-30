@@ -1,0 +1,676 @@
+{
+  "info": {
+    "_postman_id": "b3418036-a35d-4205-8634-9e869cdcb66b",
+    "name": "Incident RCA Lab - Order API",
+    "description": "Requests for baseline checks and for reproducing/validating each of the 5 incidents. Run the 'Baseline' folder with the Collection Runner before and after each incident.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "0 - Baseline (smoke test)",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('DB is up', () => pm.expect(pm.response.json().db).to.eql('up'));",
+                  "pm.test('Response time < 500 ms', () => pm.expect(pm.response.responseTime).to.be.below(500));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('10 products', () => pm.expect(pm.response.json().length).to.eql(10));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get product 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get missing product (expect 404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "9999"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_email\": \"user42@example.com\",\n  \"product_id\": 2,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Order id returned', () => pm.expect(pm.response.json().order_id).to.be.a('number'));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order - invalid body (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search orders by email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/search?email=user42@example.com",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "user42@example.com"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 200 ms', () => pm.expect(pm.response.responseTime).to.be.below(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Case 1 - HTTP 500 after release",
+      "item": [
+        {
+          "name": "Create order (fails on v1.1.0)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "After `./scripts/chaos.sh inject 1` this returns 500. Copy the request_id from the response and grep it in logs/api/api.log.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_email\": \"user42@example.com\",\n  \"product_id\": 2,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health (still says ok!)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Shallow health check passes even though orders fail - a key RCA finding."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Note the version', () => console.log('version=' + pm.response.json().version));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Case 2 - Database down",
+      "item": [
+        {
+          "name": "Health (expect 503 during incident)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List products (expect 503 during incident)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Case 3 - Slow query",
+      "item": [
+        {
+          "name": "Search orders (latency SLO 200 ms)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/search?email=user7@example.com",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "user7@example.com"
+                }
+              ]
+            },
+            "description": "Use the Collection Runner with 30 iterations to see latency during the incident."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 200 ms', () => pm.expect(pm.response.responseTime).to.be.below(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Case 4 - Worker OOM",
+      "item": [
+        {
+          "name": "Export ALL orders (triggers incident - do not run casually)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "export"
+              ]
+            },
+            "description": "On v1.0.0 this loads 500k rows into memory and the worker is OOM-killed (Postman shows 'socket hang up' / empty response)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Export paginated (after fix v1.0.1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/export?limit=1000&after_id=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1000"
+                },
+                {
+                  "key": "after_id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Max 1000 rows', () => pm.expect(pm.response.json().count).to.be.at.most(1000));",
+                  "if (pm.response.json().next_after_id) pm.collectionVariables.set('afterId', pm.response.json().next_after_id);",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Export next page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/export?limit=1000&after_id={{afterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1000"
+                },
+                {
+                  "key": "after_id",
+                  "value": "{{afterId}}"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Case 5 - Lock wait timeout",
+      "item": [
+        {
+          "name": "Create order for product 1 (hangs 15 s then 500 during incident)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_email\": \"user42@example.com\",\n  \"product_id\": 1,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Response time < 1000 ms', () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order for product 2 (unaffected - proves row-level lock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_email\": \"user42@example.com\",\n  \"product_id\": 2,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Response time < 1000 ms', () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
