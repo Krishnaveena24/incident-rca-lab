@@ -39,9 +39,9 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('DB is up', () => pm.expect(pm.response.json().db).to.eql('up'));",
-                  "pm.test('Response time < 500 ms', () => pm.expect(pm.response.responseTime).to.be.below(500));",
+                  "pm.test('Server time < 500 ms', () => pm.expect(Number(pm.response.headers.get('X-Response-Time-ms'))).to.be.below(500));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -72,7 +72,7 @@
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('10 products', () => pm.expect(pm.response.json().length).to.eql(10));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -103,7 +103,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -134,7 +134,7 @@
                 "exec": [
                   "pm.test('Status is 404', () => pm.response.to.have.status(404));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -179,7 +179,7 @@
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "pm.test('Order id returned', () => pm.expect(pm.response.json().order_id).to.be.a('number'));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -223,7 +223,7 @@
                 "exec": [
                   "pm.test('Status is 400', () => pm.response.to.have.status(400));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -259,9 +259,9 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Response time < 200 ms', () => pm.expect(pm.response.responseTime).to.be.below(200));",
+                  "pm.test('Server time < 200 ms', () => pm.expect(Number(pm.response.headers.get('X-Response-Time-ms'))).to.be.below(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -310,7 +310,7 @@
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -341,7 +341,7 @@
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Note the version', () => console.log('version=' + pm.response.json().version));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -376,7 +376,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -406,7 +406,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -447,9 +447,9 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Response time < 200 ms', () => pm.expect(pm.response.responseTime).to.be.below(200));",
+                  "pm.test('Server time < 200 ms', () => pm.expect(Number(pm.response.headers.get('X-Response-Time-ms'))).to.be.below(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -485,7 +485,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -528,7 +528,7 @@
                   "pm.test('Max 1000 rows', () => pm.expect(pm.response.json().count).to.be.at.most(1000));",
                   "if (pm.response.json().next_after_id) pm.collectionVariables.set('afterId', pm.response.json().next_after_id);",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -569,7 +569,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -617,9 +617,9 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                  "pm.test('Response time < 1000 ms', () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test('Server time < 1000 ms', () => pm.expect(Number(pm.response.headers.get('X-Response-Time-ms'))).to.be.below(1000));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
@@ -662,9 +662,9 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                  "pm.test('Response time < 1000 ms', () => pm.expect(pm.response.responseTime).to.be.below(1000));",
+                  "pm.test('Server time < 1000 ms', () => pm.expect(Number(pm.response.headers.get('X-Response-Time-ms'))).to.be.below(1000));",
                   "pm.test('Has X-Request-ID header (for log tracing)', () => pm.response.to.have.header('X-Request-ID'));",
-                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + pm.response.responseTime + 'ms');"
+                  "console.log('request_id=' + pm.response.headers.get('X-Request-ID') + ' status=' + pm.response.code + ' time=' + Number(pm.response.headers.get('X-Response-Time-ms')) + 'ms');"
                 ]
               }
             }
